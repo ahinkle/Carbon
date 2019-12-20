@@ -20,6 +20,7 @@ env:
     - coverage=false
     - phpstan=false
     - laravel=false
+    - preload=false
 
 sudo: false
 
@@ -33,6 +34,8 @@ before_install:
   - if [[ $laravel = 'true' ]]; then printf "\n" | pecl install -f redis; fi
   - if [[ $laravel = 'true' ]]; then travis_retry composer self-update; fi
   - if [[ $laravel = 'true' ]]; then mysql -e 'CREATE DATABASE forge;'; fi
+  - if [[ $preload = 'true' ]]; then cp tests/preload.php ~/preload.php; fi
+  - if [[ $preload = 'true' ]]; then echo "opcache.preload = ~/preload.php" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
 
 install:
   - composer remove --no-update friendsofphp/php-cs-fixer
@@ -104,6 +107,8 @@ matrix:
         - coverage=true
     - php: 7.4
       env: setup=lowest
+    - php: 7.4
+      env: preload=true
     - php: 7.4
     - php: nightly
       env: setup=nightly
